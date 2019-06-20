@@ -63,32 +63,22 @@ class ERC20Token(BaseContractWrapper):
         _value = int(_value)
 
         func = self._ERC20Token(token_address).functions.approve(
-            _spender,
-            _value
+            _spender, _value
         )
         return self._invoke_function_call(
-            func=func,
-            tx_params=tx_params,
-            view_only=view_only
+            func=func, tx_params=tx_params, view_only=view_only
         )
 
-    # pylint: disable=too-many-arguments
-    def totalSupply(
-        self,
-        token_address: str,
-    ) -> int:
+    def totalSupply(self, token_address: str) -> int:
         """Query total supply of token
 
         :returns: Total supply of token
         """
         token_address = self._validate_and_checksum_address(token_address)
 
-        func = self._ERC20Token(token_address).functions.totalSupply(
-        )
+        func = self._ERC20Token(token_address).functions.totalSupply()
         return self._invoke_function_call(
-            func=func,
-            tx_params=None,
-            view_only=True
+            func=func, tx_params=None, view_only=True
         )
 
     def transferFrom(
@@ -117,21 +107,13 @@ class ERC20Token(BaseContractWrapper):
         _value = int(_value)
 
         func = self._ERC20Token(token_address).functions.transferFrom(
-            _from,
-            _to,
-            _value
+            _from, _to, _value
         )
         return self._invoke_function_call(
-            func=func,
-            tx_params=tx_params,
-            view_only=view_only
+            func=func, tx_params=tx_params, view_only=view_only
         )
 
-    def balanceOf(
-        self,
-        token_address: str,
-        _owner: str,
-    ) -> int:
+    def balanceOf(self, token_address: str, _owner: str) -> int:
         """Query the balance of owner
 
         :param _owner: The address from which the balance will be retrieved
@@ -140,13 +122,9 @@ class ERC20Token(BaseContractWrapper):
         token_address = self._validate_and_checksum_address(token_address)
         _owner = self._validate_and_checksum_address(_owner)
 
-        func = self._ERC20Token(token_address).functions.balanceOf(
-            _owner
-        )
+        func = self._ERC20Token(token_address).functions.balanceOf(_owner)
         return self._invoke_function_call(
-            func=func,
-            tx_params=None,
-            view_only=True
+            func=func, tx_params=None, view_only=True
         )
 
     def transfer(
@@ -171,22 +149,12 @@ class ERC20Token(BaseContractWrapper):
         # safeguard against fractional inputs
         _value = int(_value)
 
-        func = self._ERC20Token(token_address).functions.transfer(
-            _to,
-            _value
-        )
+        func = self._ERC20Token(token_address).functions.transfer(_to, _value)
         return self._invoke_function_call(
-            func=func,
-            tx_params=tx_params,
-            view_only=view_only
+            func=func, tx_params=tx_params, view_only=view_only
         )
 
-    def allowance(
-        self,
-        token_address: str,
-        _owner: str,
-        _spender: str,
-    ) -> int:
+    def allowance(self, token_address: str, _owner: str, _spender: str) -> int:
         """Contract method `allowance`.
 
         :param _owner: The address of the account owning tokens
@@ -198,11 +166,8 @@ class ERC20Token(BaseContractWrapper):
         _spender = self._validate_and_checksum_address(_spender)
 
         func = self._ERC20Token(token_address).functions.allowance(
-            _owner,
-            _spender
+            _owner, _spender
         )
         return self._invoke_function_call(
-            func=func,
-            tx_params=None,
-            view_only=True
+            func=func, tx_params=None, view_only=True
         )
