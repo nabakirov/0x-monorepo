@@ -16,17 +16,17 @@ def erc20_wrapper(ganache_provider):
     return ERC20Token(ganache_provider)
 
 
-def test_erc20_wrapper__balance_of(
+def test_erc20_wrapper__balanceOf(
     accounts,
     erc20_wrapper,  # pylint: disable=redefined-outer-name
     weth_address,
     weth_instance,  # pylint: disable=redefined-outer-name
 ):
     """Test getting baance of an account for an ERC20 token."""
-    acc1_original_weth_balance = erc20_wrapper.balance_of(
+    acc1_original_weth_balance = erc20_wrapper.balanceOf(
         weth_address, accounts[0]
     )
-    acc2_original_weth_balance = erc20_wrapper.balance_of(
+    acc2_original_weth_balance = erc20_wrapper.balanceOf(
         weth_address, accounts[1]
     )
 
@@ -38,8 +38,8 @@ def test_erc20_wrapper__balance_of(
     weth_instance.functions.deposit().transact(
         {"from": accounts[1], "value": expected_difference}
     )
-    acc1_weth_balance = erc20_wrapper.balance_of(weth_address, accounts[0])
-    acc2_weth_balance = erc20_wrapper.balance_of(weth_address, accounts[1])
+    acc1_weth_balance = erc20_wrapper.balanceOf(weth_address, accounts[0])
+    acc2_weth_balance = erc20_wrapper.balanceOf(weth_address, accounts[1])
 
     assert (
         acc1_weth_balance - acc1_original_weth_balance == expected_difference
