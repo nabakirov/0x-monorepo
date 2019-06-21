@@ -19,6 +19,7 @@ import {
 import { affiliateFeeUtils } from '../utils/affiliate_fee_utils';
 import { assert } from '../utils/assert';
 import { assetDataUtils } from '../utils/asset_data_utils';
+import { SwapQuoteConsumerUtils } from '../utils/swap_quote_consumer_utils';
 import { utils } from '../utils/utils';
 
 export class ForwarderSwapQuoteConsumer implements SwapQuoteConsumer<ForwarderMarketBuySmartContractParams> {
@@ -146,7 +147,7 @@ export class ForwarderSwapQuoteConsumer implements SwapQuoteConsumer<ForwarderMa
 
         const { orders, feeOrders, makerAssetFillAmount, worstCaseQuoteInfo } = swapQuoteWithAffiliateFee;
 
-        const finalTakerAddress = await this._getTakerAddressOrThrowAsync(opts);
+        const finalTakerAddress = await SwapQuoteConsumerUtils.getTakerAddressOrThrowAsync(this.provider, opts);
 
         try {
             const txHash = await this._contractWrappers.forwarder.marketBuyOrdersWithEthAsync(
@@ -171,21 +172,6 @@ export class ForwarderSwapQuoteConsumer implements SwapQuoteConsumer<ForwarderMa
                 throw new Error(SwapQuoteConsumerError.TransactionValueTooLow);
             } else {
                 throw err;
-            }
-        }
-    }
-
-    private async _getTakerAddressOrThrowAsync(opts: Partial<ForwarderSwapQuoteExecutionOpts>): Promise<string> {
-        if (opts.takerAddress !== undefined) {
-            return opts.takerAddress;
-        } else {
-            const web3Wrapper = new Web3Wrapper(this.provider);
-            const availableAddresses = await web3Wrapper.getAvailableAddressesAsync();
-            const firstAvailableAddress = _.head(availableAddresses);
-            if (firstAvailableAddress !== undefined) {
-                return firstAvailableAddress;
-            } else {
-                throw new Error(SwapQuoteConsumerError.NoAddressAvailable);
             }
         }
     }
