@@ -273,11 +273,9 @@ describe('Exchange core', () => {
                     constants.INITIAL_ERC20_BALANCE,
                 );
                 // Approve the order validator.
-                await exchange.setOrderValidatorApproval.awaitTransactionSuccessAsync(
-                    validatorWallet.address,
-                    true,
-                    { from: makerAddress },
-                );
+                await exchange.setOrderValidatorApproval.awaitTransactionSuccessAsync(validatorWallet.address, true, {
+                    from: makerAddress,
+                });
                 signedOrder = await orderFactory.newSignedOrderAsync({
                     makerFee: constants.ZERO_AMOUNT,
                     takerFee: constants.ZERO_AMOUNT,
@@ -298,22 +296,16 @@ describe('Exchange core', () => {
                     makerAddress,
                 );
                 const fillAmount = signedOrder.takerAssetAmount.div(10);
-                await exchangeWrapper.fillOrderAsync(
-                    signedOrder,
-                    takerAddress,
-                    { takerAssetFillAmount: fillAmount },
-                );
+                await exchangeWrapper.fillOrderAsync(signedOrder, takerAddress, { takerAssetFillAmount: fillAmount });
                 // Reject the signature check for the second fill.
                 await validatorWallet.setValidateAction.awaitTransactionSuccessAsync(
                     orderHashHex,
                     ValidatorWalletAction.Reject,
                     makerAddress,
                 );
-                const tx = exchangeWrapper.fillOrderAsync(
-                    signedOrder,
-                    takerAddress,
-                    { takerAssetFillAmount: fillAmount },
-                );
+                const tx = exchangeWrapper.fillOrderAsync(signedOrder, takerAddress, {
+                    takerAssetFillAmount: fillAmount,
+                });
                 const expectedError = new ExchangeRevertErrors.SignatureError(
                     ExchangeRevertErrors.SignatureErrorCode.BadSignature,
                     orderHashHex,
@@ -324,9 +316,7 @@ describe('Exchange core', () => {
             });
 
             it('should revert if `OrderWallet` signature type rejects during a second fill', async () => {
-                const signature = Buffer.concat([
-                    ethUtil.toBuffer([SignatureType.OrderWallet]),
-                ]);
+                const signature = Buffer.concat([ethUtil.toBuffer([SignatureType.OrderWallet])]);
                 signedOrder.makerAddress = validatorWallet.address;
                 signedOrder.signature = ethUtil.bufferToHex(signature);
                 const orderHashHex = orderHashUtils.getOrderHashHex(signedOrder);
@@ -337,22 +327,16 @@ describe('Exchange core', () => {
                     makerAddress,
                 );
                 const fillAmount = signedOrder.takerAssetAmount.div(10);
-                await exchangeWrapper.fillOrderAsync(
-                    signedOrder,
-                    takerAddress,
-                    { takerAssetFillAmount: fillAmount },
-                );
+                await exchangeWrapper.fillOrderAsync(signedOrder, takerAddress, { takerAssetFillAmount: fillAmount });
                 // Reject the signature check for the second fill.
                 await validatorWallet.setValidateAction.awaitTransactionSuccessAsync(
                     orderHashHex,
                     ValidatorWalletAction.Reject,
                     makerAddress,
                 );
-                const tx = exchangeWrapper.fillOrderAsync(
-                    signedOrder,
-                    takerAddress,
-                    { takerAssetFillAmount: fillAmount },
-                );
+                const tx = exchangeWrapper.fillOrderAsync(signedOrder, takerAddress, {
+                    takerAssetFillAmount: fillAmount,
+                });
                 const expectedError = new ExchangeRevertErrors.SignatureError(
                     ExchangeRevertErrors.SignatureErrorCode.BadSignature,
                     orderHashHex,
@@ -363,9 +347,7 @@ describe('Exchange core', () => {
             });
 
             it('should revert if `EIP1271OrderWallet` signature type rejects during a second fill', async () => {
-                const signature = Buffer.concat([
-                    ethUtil.toBuffer([SignatureType.EIP1271OrderWallet]),
-                ]);
+                const signature = Buffer.concat([ethUtil.toBuffer([SignatureType.EIP1271OrderWallet])]);
                 signedOrder.makerAddress = validatorWallet.address;
                 signedOrder.signature = ethUtil.bufferToHex(signature);
                 const orderHashHex = orderHashUtils.getOrderHashHex(signedOrder);
@@ -376,22 +358,16 @@ describe('Exchange core', () => {
                     signedOrder.makerAddress,
                 );
                 const fillAmount = signedOrder.takerAssetAmount.div(10);
-                await exchangeWrapper.fillOrderAsync(
-                    signedOrder,
-                    takerAddress,
-                    { takerAssetFillAmount: fillAmount },
-                );
+                await exchangeWrapper.fillOrderAsync(signedOrder, takerAddress, { takerAssetFillAmount: fillAmount });
                 // Reject the signature check for the second fill.
                 await validatorWallet.setValidateAction.awaitTransactionSuccessAsync(
                     orderHashHex,
                     ValidatorWalletAction.Reject,
                     signedOrder.makerAddress,
                 );
-                const tx = exchangeWrapper.fillOrderAsync(
-                    signedOrder,
-                    takerAddress,
-                    { takerAssetFillAmount: fillAmount },
-                );
+                const tx = exchangeWrapper.fillOrderAsync(signedOrder, takerAddress, {
+                    takerAssetFillAmount: fillAmount,
+                });
                 const expectedError = new ExchangeRevertErrors.SignatureError(
                     ExchangeRevertErrors.SignatureErrorCode.BadSignature,
                     orderHashHex,
