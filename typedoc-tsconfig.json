@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "outDir": "lib",
         "module": "commonjs",
         "target": "es5",
         "lib": ["es2017", "dom"],
@@ -13,5 +14,6 @@
         "skipLibCheck": true,
         "typeRoots": ["node_modules/@0x/typescript-typings/types", "node_modules/@types"],
         "strict": true
-    }
+    },
+    "include": ["./src/**/*", "./test/**/*"]
 }

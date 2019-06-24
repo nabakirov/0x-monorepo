@@ -1,94 +1,91 @@
 {
-    "private": true,
-    "name": "0x-monorepo",
-    "engines": {
-        "node": ">=6.12"
-    },
-    "workspaces": [
-        "packages/*",
-        "contracts/*"
+    "name": "@0x/order-watcher",
+    "version": "4.0.11",
+    "description": "An order watcher daemon that watches for order validity",
+    "keywords": [
+        "0x",
+        "0xproject",
+        "ethereum",
+        "exchange",
+        "orderbook"
     ],
+    "main": "lib/src/index.js",
+    "types": "lib/src/index.d.ts",
     "scripts": {
-        "deps_versions:ci": "node ./packages/monorepo-scripts/lib/deps_versions.js",
-        "fix": "wsrun fix $PKG --fast-exit --parallel --exclude-missing",
-        "ganache": "ganache-cli -p 8545 --gasLimit 10000000 --networkId 50 -m \"${npm_package_config_mnemonic}\"",
-        "prettier": "prettier --write '**/*.{ts,tsx,json,md}' --config .prettierrc",
-        "prettier:ci": "prettier --list-different '**/*.{ts,tsx,json,md}' --config .prettierrc",
-        "report_coverage": "lcov-result-merger './{packages/*/coverage/lcov.info,python-packages/*/.coverage}' | coveralls",
-        "test:installation": "node ./packages/monorepo-scripts/lib/test_installation.js",
-        "test:installation:local": "IS_LOCAL_PUBLISH=true node ./packages/monorepo-scripts/lib/test_installation.js",
-        "test:publish:circleci": "yarn npm-cli-login -u test -p test -e test@example.com -r http://localhost:4873 && IS_LOCAL_PUBLISH=true run-s script:publish test:installation:local",
-        "run:publish": "run-s install:all build:monorepo_scripts script:prepublish_checks rebuild:no_website script:publish",
-        "run:publish:local": "IS_LOCAL_PUBLISH=true yarn run:publish",
-        "script:prepublish_checks": "node ./packages/monorepo-scripts/lib/prepublish_checks.js",
-        "script:publish": "node ./packages/monorepo-scripts/lib/publish.js",
-        "install:all": "yarn install",
-        "wsrun": "wsrun",
-        "lerna": "lerna",
-        "build": "lerna link && wsrun build $PKG --fast-exit -r --stages --exclude @0x/pipeline --exclude-missing",
-        "build:no_website": "lerna link && wsrun build $PKG --fast-exit -r --stages --exclude @0x/website --exclude @0x/pipeline --exclude-missing",
-        "build:ci:no_website": "lerna link && wsrun build:ci $PKG --fast-exit -r --stages --exclude @0x/website --exclude @0x/pipeline --exclude-missing",
-        "build:contracts": "lerna link && wsrun build -p ${npm_package_config_contractsPackages} -c --fast-exit -r --stages --exclude-missing",
-        "build:monorepo_scripts": "PKG=@0x/monorepo-scripts yarn build",
-        "build:ts": "tsc -b",
-        "watch:ts": "tsc -b -w",
-        "clean": "wsrun clean $PKG --fast-exit -r --parallel --exclude-missing",
-        "clean:contracts": "wsrun clean -p ${npm_package_config_contractsPackages} -c --fast-exit -r --parallel --exclude-missing",
-        "contracts:gen": "wsrun contracts:gen $PKG --fast-exit -r --parallel --exclude-missing",
-        "contracts:compile": "wsrun compile $PKG --fast-exit -r --stages --exclude-missing",
-        "contracts:watch": "wsrun watch $PKG --parallel --exclude-missing",
-        "remove_node_modules": "lerna clean --yes; rm -rf node_modules",
-        "rebuild": "run-s clean build",
-        "rebuild:no_website": "run-s clean build:no_website",
-        "test": "wsrun test $PKG --fast-exit --serial --exclude-missing",
-        "test:contracts": "wsrun test -p ${npm_package_config_contractsPackages} -c --fast-exit --serial --exclude-missing",
-        "generate_doc": "node ./packages/monorepo-scripts/lib/doc_generate_and_upload.js",
-        "test:generate_docs:circleci": "for i in ${npm_package_config_packagesWithDocPages}; do yarn generate_doc --package $i --shouldUpload false --isStaging true || break -1; done;",
-        "bundlewatch": "bundlewatch",
-        "lint": "wsrun lint $PKG --fast-exit --parallel --exclude-missing"
+        "build": "yarn tsc -b",
+        "build:ci": "yarn build",
+        "lint": "tslint --format stylish --project .",
+        "fix": "tslint --fix --format stylish --project .",
+        "test:circleci": "run-s test:coverage",
+        "test": "yarn run_mocha",
+        "rebuild_and_test": "run-s build test",
+        "test:coverage": "nyc npm run test --all && yarn coverage:report:lcov",
+        "coverage:report:lcov": "nyc report --reporter=text-lcov > coverage/lcov.info",
+        "clean": "shx rm -rf _bundles lib test_temp generated_docs",
+        "run_mocha": "mocha --require source-map-support/register --require make-promises-safe lib/test/**/*_test.js lib/test/global_hooks.js --timeout 10000 --bail --exit",
+        "docs:json": "typedoc --excludePrivate --excludeExternals --target ES5 --tsconfig typedoc-tsconfig.json --json $JSON_FILE_PATH $PROJECT_FILES"
     },
     "config": {
-        "contractsPackages": "@0x/contracts-asset-proxy @0x/contracts-erc20 @0x/contracts-erc721 @0x/contracts-erc1155 @0x/contracts-exchange @0x/contracts-exchange-forwarder @0x/contracts-exchange-libs @0x/contracts-extensions @0x/contracts-multisig @0x/contracts-test-utils @0x/contracts-utils @0x/contracts-coordinator @0x/contracts-dev-utils",
-        "mnemonic": "concert load couple harbor equip island argue ramp clarify fence smart topic",
-        "packagesWithDocPages": "0x.js connect json-schemas subproviders web3-wrapper contract-wrappers order-utils order-watcher sol-compiler sol-coverage sol-profiler sol-trace ethereum-types asset-buyer migrations",
-        "ignoreDependencyVersions": "@types/styled-components @types/node",
-        "ignoreDependencyVersionsForPackage": "website instant dev-tools-pages"
-    },
-    "bundlewatch": {
-        "files": [
-            {
-                "path": "packages/0x.js/_bundles/index.min.js",
-                "maxSize": "800kB"
-            },
-            {
-                "path": "packages/instant/umd/instant.js",
-                "maxSize": "1000kB"
-            }
-        ],
-        "ci": {
-            "trackBranches": [
-                "master",
-                "development"
-            ],
-            "repoBranchBase": "development"
+        "postpublish": {
+            "dockerHubRepo": "order-watcher"
         }
     },
-    "resolutions": {
-        "graceful-fs": "4.1.15"
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/0xProject/0x-monorepo"
+    },
+    "license": "Apache-2.0",
+    "engines": {
+        "node": ">=6.0.0"
     },
     "devDependencies": {
-        "@0x-lerna-fork/lerna": "3.0.0-beta.26",
-        "@0xproject/npm-cli-login": "^0.0.11",
-        "async-child-process": "^1.1.1",
-        "bundlewatch": "^0.2.1",
-        "coveralls": "^3.0.0",
-        "ganache-cli": "6.4.1",
-        "lcov-result-merger": "^3.0.0",
-        "lerna": "^3.0.0-beta.25",
+        "@0x/dev-utils": "^2.2.3",
+        "@0x/migrations": "^4.1.6",
+        "@0x/subproviders": "^4.1.0",
+        "@0x/tslint-config": "^3.0.1",
+        "@types/bintrees": "^1.0.2",
+        "@types/lodash": "4.14.104",
+        "@types/mocha": "^2.2.42",
+        "@types/node": "*",
+        "@types/sinon": "^2.2.2",
+        "chai": "^4.0.1",
+        "chai-as-promised": "^7.1.0",
+        "chai-bignumber": "^3.0.0",
+        "dirty-chai": "^2.0.1",
+        "make-promises-safe": "^1.1.0",
+        "mocha": "^4.1.0",
         "npm-run-all": "^4.1.2",
-        "prettier": "^1.16.3",
-        "source-map-support": "^0.5.6",
-        "typescript": "3.0.1",
-        "wsrun": "^2.2.0"
+        "nyc": "^11.0.1",
+        "opn-cli": "^3.1.0",
+        "shx": "^0.2.2",
+        "sinon": "^4.0.0",
+        "source-map-support": "^0.5.0",
+        "tslint": "5.11.0",
+        "typescript": "3.0.1"
+    },
+    "dependencies": {
+        "@0x/abi-gen-wrappers": "^4.3.0",
+        "@0x/assert": "^2.0.10",
+        "@0x/base-contract": "^5.1.0",
+        "@0x/contract-addresses": "^2.3.3",
+        "@0x/contract-artifacts": "^1.5.1",
+        "@0x/contract-wrappers": "^9.1.4",
+        "@0x/fill-scenarios": "^3.0.10",
+        "@0x/json-schemas": "^3.0.10",
+        "@0x/order-utils": "^8.1.1",
+        "@0x/types": "^2.2.2",
+        "@0x/typescript-typings": "^4.2.2",
+        "@0x/utils": "^4.3.3",
+        "@0x/web3-wrapper": "^6.0.6",
+        "bintrees": "^1.0.2",
+        "ethereum-types": "^2.1.2",
+        "ethereumjs-blockstream": "6.0.0",
+        "ethers": "~4.0.4",
+        "lodash": "^4.17.11",
+        "semaphore-async-await": "^1.5.1",
+        "websocket": "^1.0.26"
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }
